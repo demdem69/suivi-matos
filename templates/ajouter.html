@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h2>Ajouter du matériel</h2>
+
+<form method="post" action="{{ url_for('ajouter_materiel') }}" class="carte">
+  <label>Nom *
+    <input name="nom" required value="{{ form.get('nom', '') }}">
+  </label>
+  <label>Référence
+    <input name="reference" value="{{ form.get('reference', '') }}">
+  </label>
+  <label>N° de série
+    <input name="numero_serie" value="{{ form.get('numero_serie', '') }}">
+  </label>
+  <label>Catégorie *
+    <select name="categorie_id" required>
+      <option value="">— choisir —</option>
+      {% for c in categories %}
+      <option value="{{ c.id }}" {% if form.get('categorie_id')|string == c.id|string %}selected{% endif %}>
+        {{ c.nom }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Quantité *
+    <input type="number" name="quantite" min="1" value="{{ form.get('quantite', '1') }}" required>
+  </label>
+  <label>État
+    <select name="etat">
+      {% for e in etats %}
+      <option value="{{ e }}" {% if form.get('etat', 'en_stock') == e %}selected{% endif %}>
+        {{ e.replace('_', ' ') }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Emplacement
+    <input name="emplacement" placeholder="Étagère, casier…" value="{{ form.get('emplacement', '') }}">
+  </label>
+  <label>Remarque
+    <textarea name="remarque" rows="3">{{ form.get('remarque', '') }}</textarea>
+  </label>
+  <button type="submit">Ajouter</button>
+</form>
+
+<section class="carte">
+  <h3>Nouvelle catégorie</h3>
+  <form method="post" action="{{ url_for('ajouter_categorie') }}" class="en-ligne">
+    <input name="nom" placeholder="Nom de la catégorie" required>
+    <button type="submit">Créer</button>
+  </form>
+</section>
+{% endblock %}

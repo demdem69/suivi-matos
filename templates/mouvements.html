@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h2>Entrées / Sorties</h2>
+
+<section class="carte">
+  <h3>Matériel actuellement sorti</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Matériel</th>
+        <th>Qui</th>
+        <th>Quand</th>
+        <th>Quantité</th>
+        <th>Commentaire</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for mv in en_cours %}
+      <tr>
+        <td>{{ mv.materiel }}</td>
+        <td>{{ mv.utilisateur }}</td>
+        <td>{{ mv.date_mouvement }}</td>
+        <td>{{ mv.quantite }}</td>
+        <td>{{ mv.remarque or "—" }}</td>
+        <td>
+          <form method="post" action="{{ url_for('declarer_entree') }}" class="en-ligne">
+            <input type="hidden" name="mouvement_id" value="{{ mv.id }}">
+            <button type="submit">Restituer</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">Aucun matériel sorti actuellement.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<div class="deux-colonnes">
+  <section class="carte">
+    <h3>Déclarer une sortie</h3>
+    <form method="post" action="{{ url_for('declarer_sortie') }}">
+      <label>Matériel *
+        <select name="materiel_id" required>
+          <option value="">— choisir —</option>
+          {% for m in materiel_dispo %}
+          <option value="{{ m.id }}">{{ m.nom }} ({{ m.disponible }} dispo.)</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Qui prend le matériel *
+        <select name="utilisateur_id" required>
+          <option value="">— choisir —</option>
+          {% for u in utilisateurs %}
+          <option value="{{ u.id }}">{{ u.nom }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Date et heure
+        <input type="datetime-local" name="date_mouvement" value="{{ maintenant }}">
+      </label>
+      <label>Quantité *
+        <input type="number" name="quantite" min="1" value="1" required>
+      </label>
+      <label>Commentaire
+        <textarea name="remarque" rows="2" placeholder="Motif, chantier…"></textarea>
+      </label>
+      <button type="submit">Enregistrer la sortie</button>
+    </form>
+  </section>
+
+  <section class="carte">
+    <h3>Déclarer une entrée</h3>
+    <p class="aide">Pour une restitution, utilisez le bouton « Restituer » ci-dessus.
+    Ce formulaire sert aux entrées de stock sans sortie préalable.</p>
+    <form method="post" action="{{ url_for('declarer_entree') }}">
+      <label>Matériel *
+        <select name="materiel_id" required>
+          <option value="">— choisir —</option>
+          {% for m in materiel_dispo %}
+          <option value="{{ m.id }}">{{ m.nom }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Qui déclare *
+        <select name="utilisateur_id" required>
+          <option value="">— choisir —</option>
+          {% for u in utilisateurs %}
+          <option value="{{ u.id }}">{{ u.nom }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Date et heure
+        <input type="datetime-local" name="date_mouvement" value="{{ maintenant }}">
+      </label>
+      <label>Quantité *
+        <input type="number" name="quantite" min="1" value="1" required>
+      </label>
+      <label>Commentaire
+        <textarea name="remarque" rows="2" placeholder="Retour de prêt, achat…"></textarea>
+      </label>
+      <button type="submit">Enregistrer l'entrée</button>
+    </form>
+  </section>
+</div>
+
+<section class="carte">
+  <h3>Historique récent</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Matériel</th>
+        <th>Qui</th>
+        <th>Quand</th>
+        <th>Quantité</th>
+        <th>Restitué le</th>
+        <th>Commentaire</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for mv in historique %}
+      <tr>
+        <td>{{ "Sortie" if mv.type == "sortie" else "Entrée" }}</td>
+        <td>{{ mv.materiel }}</td>
+        <td>{{ mv.utilisateur }}</td>
+        <td>{{ mv.date_mouvement }}</td>
+        <td>{{ mv.quantite }}</td>
+        <td>{{ mv.rendu_le or ("—" if mv.type == "entree" else "en cours") }}</td>
+        <td>{{ mv.remarque or "—" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7">Aucun mouvement enregistré.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
