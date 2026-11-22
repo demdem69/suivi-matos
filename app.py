@@ -23,6 +23,7 @@ app.secret_key = os.environ.get("INVENTAIRE_SECRET", "dev-local-change-me")
 
 def assurer_schema():
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode = WAL")
         colonnes = [r[1] for r in conn.execute("PRAGMA table_info(mouvements)")]
         if "rendu_le" not in colonnes:
             conn.execute("ALTER TABLE mouvements ADD COLUMN rendu_le TEXT")
@@ -339,4 +340,8 @@ def normaliser_date(valeur):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(
+        host=os.environ.get("INVENTAIRE_HOST", "127.0.0.1"),
+        port=int(os.environ.get("INVENTAIRE_PORT", "5000")),
+        debug=os.environ.get("INVENTAIRE_DEBUG") == "1",
+    )
