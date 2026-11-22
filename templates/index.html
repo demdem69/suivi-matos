@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h2>Inventaire</h2>
+<p>{{ materiel|length }} article(s) référencé(s), {{ total }} unité(s) au total.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Catégorie</th>
+      <th>Référence</th>
+      <th>N° de série</th>
+      <th>Quantité</th>
+      <th>État</th>
+      <th>Emplacement</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m in materiel %}
+    <tr>
+      <td>{{ m.nom }}</td>
+      <td>{{ m.categorie }}</td>
+      <td>{{ m.reference or "—" }}</td>
+      <td>{{ m.numero_serie or "—" }}</td>
+      <td>{{ m.quantite }}</td>
+      <td><span class="etat etat-{{ m.etat }}">{{ m.etat.replace('_', ' ') }}</span></td>
+      <td>{{ m.emplacement or "—" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">Aucun matériel enregistré.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
